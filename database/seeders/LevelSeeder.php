@@ -6,13 +6,13 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+
 class LevelSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        DB::table('m_level')->truncate(); // Clears the table
+
         $data = [
             ['level_id' => 1, 'level_kode' => 'ADM', 'level_nama' => 'Administrator'],
             ['level_id' => 2, 'level_kode' => 'MNG', 'level_nama' => 'Manager' ],
@@ -22,3 +22,4 @@ class LevelSeeder extends Seeder
         DB::table('m_level')->insert($data);
     }
 }
+
