@@ -2,65 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    /**
-     * Menampilkan halaman login
-     */
     public function login()
     {
-        // Jika sudah login, arahkan ke halaman utama
-        if (Auth::check()) {
+        if (Auth::check()) { // if you are logged in, then redirect to the home page
             return redirect('/');
         }
-
         return view('auth.login');
     }
 
-    /**
-     * Proses login
-     */
     public function postlogin(Request $request)
-{
-    if ($request->ajax() || $request->wantsJson()) {
-        $credentials = $request->only('username', 'password');
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $credentials = $request->only('username', 'password');
 
-        if (Auth::attempt($credentials)) {
+            if (Auth::attempt($credentials)) {
+                $user = User::where('username', $credentials['username'])->first();
+                Auth::login($user);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Login Successful',
+                    'redirect' => url('/')
+                ]);
+            }
             return response()->json([
-                'status' => true,
-                'message' => 'Login Successful',
-                'redirect' => url('/')
+                'status' => false,
+                'message' => 'Login Failed'
             ]);
         }
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Username atau password salah!',
-            'msgField' => [
-                'username' => ['Username atau password salah'],
-                'password' => ['Silakan coba lagi']
-            ]
-        ]);
+        return redirect('login');
     }
 
-    return redirect('login');
-
-}
-
-
-    /**
-     * Proses logout
-     */
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect('login');
     }
 }
